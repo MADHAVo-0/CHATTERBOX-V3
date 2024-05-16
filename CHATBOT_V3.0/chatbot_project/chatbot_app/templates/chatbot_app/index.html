@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <style>
+        /* Reset default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            /*transition: background-color 0.3s ease, color 0.3s ease;*/
+        }
+
+        /* Light mode background with green dots */
+        body.light-mode {
+            background-color: #aeaeae;
+            background-image: radial-gradient(#00a906 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        /* Dark mode background with light blue dots */
+        body.dark-mode {
+            background-color: #333;
+            background-image: radial-gradient(#007bff 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        /* Navigation bar styles */
+        nav {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 10px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Container styles */
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 60px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Heading styles */
+        h1 {
+            font-size: 32px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        /* Chatbox styles */
+        #chatbox {
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Form styles */
+        form {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 16px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Feedback styles */
+        #feedback_buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #feedback_buttons button {
+            margin: 0 5px;
+        }
+
+        #correct_response {
+            display: block;
+            width: 100%;
+            padding: 10px 16px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* About Us styles */
+        #about-us {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        #about-us-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode .container {
+            background-color: #444;
+            color: #fff;
+        }
+
+        body.dark-mode #chatbox {
+            background-color: #555;
+        }
+
+        body.dark-mode input[type="text"],
+        body.dark-mode #correct_response {
+            background-color: #666;
+            color: #fff;
+            border-color: #777;
+        }
+
+        body.dark-mode nav {
+            background-color: #007bff;
+        }
+
+        body.dark-mode button {
+            background-color: #007bff;
+        }
+
+        body.dark-mode button:hover {
+            background-color: #0056b3;
+        }
+
+        body.dark-mode #about-us-content {
+            background-color: #444;
+            color: #fff;
+        }
+
+        /* Toggle switch styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4caf50;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #4caf50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        #landing-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #chat-button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        #chat-button:hover {
+            background-color: #45a049;
+        }
+        
+    </style>
+</head>
+<body>
+<nav>
+    <a href="#">CHATTERBOX-V3</a>
+    <div>
+        <a href="#" onclick="toggleAboutUs()">About Us</a>
+        <label class="switch">
+            <input type="checkbox" onclick="toggleDarkMode()" id="darkModeToggle">
+            <span class="slider round"></span>
+        </label>
+    </div>
+</nav>
+
+<div id="about-us">
+    <div id="about-us-content">
+        <h2>About Us</h2>
+        <p>Made by Madhav & Shyam</p>
+        <button onclick="toggleAboutUs()">Close</button>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Chatbot</h1>
+    <div id="chatbox"></div>
+    <form id="chatbot-form" onsubmit="sendMessage(event)">
+        {% csrf_token %}
+        <input type="text" id="user_input" placeholder="Type your message...">
+        <button id="send_button" type="submit">Send</button>
+    </form>
+    <div id="feedback_buttons" style="display: none;">
+        <button onclick="provideFeedback('yes')">Yes</button>
+        <button onclick="provideFeedback('no')">No</button>
+    </div>
+    <input type="text" id="correct_response" placeholder="Enter correct response..." style="display: none;">
+</div>
+<div id="landing-page">
+    <div style="text-align: center; margin-top: 20vh;">
+        <h1 style="color: black;">CHATTERBOX-V3</h1>
+        <button id="chat-button" onclick="showChatbot()">Chat</button>
+    </div>
+</div>
+<script>
+    function sendMessage(event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        var user_input = document.getElementById('user_input').value;
+        var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '', true);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText).response;
+                document.getElementById('chatbox').innerHTML += 'You: ' + user_input + '<br>';
+                document.getElementById('chatbox').innerHTML += 'Chatbot: ' + response + '<br>';
+
+                // Show feedback buttons and correct response input
+                document.getElementById('feedback_buttons').style.display = 'block';
+                document.getElementById('correct_response').style.display = 'inline';
+            }
+        }
+        xhr.send('user_input=' + user_input);
+    }
+
+    function provideFeedback(feedback) {
+        var user_input = document.getElementById('user_input').value;
+        var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        var correct_response = document.getElementById('correct_response').value;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '', true);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText).response;
+                document.getElementById('chatbox').innerHTML += 'Chatbot: ' + response + '<br>';
+
+                // Hide feedback buttons and correct response input
+                document.getElementById('feedback_buttons').style.display = 'none';
+                document.getElementById('correct_response').style.display = 'none';
+            }
+        }
+        xhr.send('user_input=' + user_input + '&feedback=' + feedback + '&correct_response=' + correct_response);
+    }
+
+    function toggleAboutUs() {
+        var aboutUs = document.getElementById('about-us');
+        aboutUs.style.display = aboutUs.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function toggleDarkMode() {
+        var body = document.body;
+        body.classList.toggle('dark-mode');
+    }
+    function showChatbot() {
+            var landingPage = document.getElementById('landing-page');
+            var body = document.body;
+
+            // Add animation for landing page disappearance
+            landingPage.style.animation = 'fade-out 1s forwards';
+
+            setTimeout(function() {
+                landingPage.style.display = 'none';
+                body.style.overflow = 'auto'; // Enable scrolling after animation
+                // Show the chatbot code
+                alert(chatbotCode); // Display the chatbot code
+            }, 1000); // Adjust the timing based on the animation duration
+        }
+</script>
+</body>
+</html>
